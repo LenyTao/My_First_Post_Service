@@ -1,0 +1,11 @@
+# Intellij
+.idea/
+*.iml
+*.iws
+.idea/
+null/
+log/
+target/
+
+# SCALA build server protocol
+.bsp/
