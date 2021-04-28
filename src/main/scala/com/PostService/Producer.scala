@@ -47,4 +47,5 @@ object Producer extends App with ConverterFromToJson {
   producer.send(new ProducerRecord[Int, String](topicName, 9, person3Stage3.toString()))
 
   producer.flush()
+
 }
