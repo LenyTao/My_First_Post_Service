@@ -16,7 +16,6 @@ object ConfigReader {
 
     val listClientId = config.getConfigList("my.clientList.team.clients") map (ClientObject(_).idClient)
     val listClientPost = config.getConfigList("my.clientList.team.clients") map (ClientObject(_).postClient)
-
     val listClientIdAndPost = listClientId.zip(listClientPost).toMap
 
     listClientIdAndPost.filter(x => x._1 == clientId).getOrElse(clientId, "Error")
