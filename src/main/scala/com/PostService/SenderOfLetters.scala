@@ -25,7 +25,6 @@ object SenderOfLetters extends App {
         new PasswordAuthentication(myAccountEmail, password)
       }
     })
-
     /** ------------------------------------- */
 
     /** 2. Создаём само сообщение */
