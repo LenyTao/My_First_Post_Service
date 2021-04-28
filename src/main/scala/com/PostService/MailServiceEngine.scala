@@ -13,7 +13,6 @@ import spray.json._
 
 
 object MailServiceEngine extends App with ConverterFromToJson {
-
   val messenger: Behavior[Event] = Behaviors.setup { _ =>
     Behaviors.receiveMessage {
       case event: Event =>
