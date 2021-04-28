@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 trait ConverterFromToJson {
-
   implicit object converterEvents extends RootJsonFormat[Event] {
     override def write(obj: Event) = JsObject(
       "externalClientId" -> JsString(obj.externalClientId),
