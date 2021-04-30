@@ -5,11 +5,11 @@ import spray.json.{ DeserializationException, JsBoolean, JsObject, JsString, JsV
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-trait Converter {
+trait JsonConverter {
 
   implicit object converterEvents extends RootJsonFormat[Event] {
 
-    override def write(obj: Event) = JsObject(
+    override def write(obj: Event): JsObject = JsObject(
       "externalClientId" -> JsString(obj.externalClientId),
       "stage"            -> JsString(obj.stage),
       "status"           -> JsBoolean(obj.status),

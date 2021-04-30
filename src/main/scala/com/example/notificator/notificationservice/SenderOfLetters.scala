@@ -12,15 +12,15 @@ object SenderOfLetters {
 
   private val logger = Logger(LoggerFactory.getLogger(this.getClass))
 
-  def sendMail(recipient: String, event: Event) = {
+  def sendMail(recipient: String, event: Event): Unit = {
     val properties = new Properties()
     properties.put("mail.smtp.auth", "true")
     properties.put("mail.smtp.starttls.enable", "true")
     properties.put("mail.smtp.host", "smtp.gmail.com")
     properties.put("mail.smtp.port", "587")
 
-    val myAccountEmail = "xxxx@gmail.com"
-    val password       = "xxxx"
+    val myAccountEmail = "xxx@gmail.com"
+    val password       = "xxx"
 
     val session = Session.getInstance(
       properties,
@@ -36,7 +36,7 @@ object SenderOfLetters {
       Transport.send(message)
     } catch {
       case ex: Exception =>
-        logger.info(
+        logger.error(
           s"Error: The message was not sent, error: $ex"
         )
     }

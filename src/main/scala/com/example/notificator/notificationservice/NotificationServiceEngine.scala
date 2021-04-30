@@ -1,6 +1,5 @@
 package com.example.notificator.notificationservice
 
-import akka.Done
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ ActorSystem, Behavior }
 import akka.kafka.{ ConsumerSettings, Subscriptions }
@@ -10,13 +9,12 @@ import org.apache.kafka.clients.consumer.{ ConsumerConfig, ConsumerRecord }
 import org.apache.kafka.common.serialization.{ IntegerDeserializer, StringDeserializer }
 import org.slf4j.LoggerFactory
 import java.time.Duration
-import scala.concurrent.Future
 import spray.json._
 
-object NotificationServiceEngine extends App with Converter {
+object NotificationServiceEngine extends App with JsonConverter {
   private val logger = Logger(LoggerFactory.getLogger(this.getClass))
 
-  val collectionEmailAddressAndIDClients = ConfigReader.readClientList()
+  private val collectionEmailAddressAndIDClients = ConfigReader.readClientList()
 
   private val messenger: Behavior[Event] = Behaviors.setup { _ =>
     Behaviors.receiveMessage {
@@ -30,11 +28,11 @@ object NotificationServiceEngine extends App with Converter {
         if (clientMail != "INVALID ID") {
           SenderOfLetters.sendMail(clientMail, event)
         } else {
-          logger.info(s"Error: The email address for a customer with ID ${clientID} does not exist in Database")
+          logger.error(s"Error: The email address for a customer with ID $clientID does not exist in Database")
         }
         Behaviors.same
       case ex =>
-        logger.info(s"Error: Invalid Event - message $ex not valid")
+        logger.error(s"Error: Invalid Event - message $ex not valid")
         Behaviors.same
     }
   }
@@ -45,7 +43,7 @@ object NotificationServiceEngine extends App with Converter {
         messengerActor ! converterEvents.read(x.value().parseJson)
         Behaviors.same
       case ex =>
-        println(s"Error: Invalid Event - record $ex not valid")
+        logger.error(s"Error: Invalid Event - record $ex not valid")
         Behaviors.same
     }
   }
@@ -68,12 +66,11 @@ object NotificationServiceEngine extends App with Converter {
 
   private val messengerActor = mailServiceEngineActorSystem.systemActorOf(messenger, "MessengerActor")
 
-  private val pipeline: Future[Done] =
-    akka.kafka.scaladsl.Consumer
-      .atMostOnceSource(consumerSettings, Subscriptions.topics("notificationMessageStore"))
-      .map { msg =>
-        mailServiceEngineActorSystem ! msg
-        msg
-      }
-      .run
+  akka.kafka.scaladsl.Consumer
+    .atMostOnceSource(consumerSettings, Subscriptions.topics("notificationMessageStore"))
+    .map { msg =>
+      mailServiceEngineActorSystem ! msg
+      msg
+    }
+    .run
 }

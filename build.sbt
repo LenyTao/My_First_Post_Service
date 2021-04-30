@@ -9,6 +9,7 @@ scalaVersion := s"$scalaCompat"
 libraryDependencies ++= Seq(
   Logging.Slf4j,
   Logging.ScalaLogging,
+  Logging.Logback,
   Config.Config,
   JsonConverter.Converter,
   Akka.Stream,

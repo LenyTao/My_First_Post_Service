@@ -1,6 +1,7 @@
 package com.example.notificator.notificationservice
 
 import com.typesafe.config.{ Config, ConfigFactory }
+
 import scala.collection.convert.ImplicitConversions.`list asScalaBuffer`
 
 object ConfigReader {
@@ -8,24 +9,26 @@ object ConfigReader {
   case class ConnectionParameters(bootstrapServers: String, groupId: String, property: String, timeout: Int)
 
   private case class ClientObject(params: Config) {
-    val idClient: String   = params.getString("id")
-    val postClient: String = params.getString("post")
+     val idClient: String = params.getString("id")
+     val postClient: String = params.getString("post")
   }
 
-  def readConnectionParameters() = {
-    val config = ConfigFactory.load("application.conf").getConfig("my.clientList.сonnectionParameters");
+  private val rootConfig: Config = ConfigFactory.load("application.conf")
 
-    val bootstrapServers: String = config.getString("bootstrapServers")
-    val groupId: String          = config.getString("groupId")
-    val property: String         = config.getString("property")
-    val timeout: Int             = config.getInt("timeout")
+  def readConnectionParameters(): ConnectionParameters = {
+    val configForConnection = rootConfig.getConfig("my.clientList.сonnectionParameters")
+
+    val bootstrapServers = configForConnection.getString("bootstrapServers")
+    val groupId          = configForConnection.getString("groupId")
+    val property         = configForConnection.getString("property")
+    val timeout          = configForConnection.getInt("timeout")
     ConnectionParameters(bootstrapServers, groupId, property, timeout)
   }
 
-  def readClientList() = {
-    val config: Config = ConfigFactory.load("application.conf")
-    val listClientId   = config.getConfigList("my.clientList.team.clients") map (ClientObject(_).idClient)
-    val listClientPost = config.getConfigList("my.clientList.team.clients") map (ClientObject(_).postClient)
+  def readClientList(): Map[String, String] = {
+    val configForClientList = rootConfig.getConfigList("my.clientList.team.clients")
+    val listClientId        = configForClientList map (ClientObject(_).idClient)
+    val listClientPost      = configForClientList map (ClientObject(_).postClient)
     listClientId.zip(listClientPost).toMap
   }
 }
