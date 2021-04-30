@@ -1,6 +1,8 @@
 package com.example.notificator.notificationservice
 
 import com.example.notificator.Event
+import com.typesafe.scalalogging.Logger
+import org.slf4j.LoggerFactory
 import java.text.SimpleDateFormat
 import java.util.{ Date, Properties }
 import javax.mail.internet.{ InternetAddress, MimeMessage }
@@ -8,8 +10,9 @@ import javax.mail._
 
 object SenderOfLetters {
 
-  def sendMail(recipient: String, event: Event) = {
+  private val logger = Logger(LoggerFactory.getLogger(this.getClass))
 
+  def sendMail(recipient: String, event: Event) = {
     val properties = new Properties()
     properties.put("mail.smtp.auth", "true")
     properties.put("mail.smtp.starttls.enable", "true")
@@ -29,8 +32,14 @@ object SenderOfLetters {
     )
 
     val message: Message = prepareMessage(session, myAccountEmail, recipient, event)
-
-    Transport.send(message)
+    try {
+      Transport.send(message)
+    } catch {
+      case ex: Exception =>
+        logger.info(
+          s"Error: The message was not sent, error: $ex"
+        )
+    }
   }
 
   private def prepareMessage(session: Session, myAccountEmail: String, recipient: String, event: Event) = {

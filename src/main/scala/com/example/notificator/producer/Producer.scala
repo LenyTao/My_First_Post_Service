@@ -1,12 +1,12 @@
 package com.example.notificator.producer
 
 import com.example.notificator.Event
-import com.example.notificator.notificationservice.ConverterFromToJson
+import com.example.notificator.notificationservice.Converter
 import org.apache.kafka.clients.producer.{ KafkaProducer, ProducerConfig, ProducerRecord }
 import org.apache.kafka.common.serialization.{ IntegerSerializer, StringSerializer }
 import java.util.{ Date, Properties }
 
-object Producer extends App with ConverterFromToJson {
+object Producer extends App with Converter {
   private val topicName = "notificationMessageStore"
 
   private val producerProperties = new Properties()
@@ -33,6 +33,8 @@ object Producer extends App with ConverterFromToJson {
   private val person2Stage2 = converterEvents.write(Event("0012-00157", "Processed", status = false, new Date()))
   private val person3Stage2 = converterEvents.write(Event("0125-00263", "Processed", status = false, new Date()))
 
+  private val invalidEvent = converterEvents.write(Event("0895-00263", "Processed", status = false, new Date()))
+
   private val person1Stage3 = converterEvents.write(Event("1234-00155", "Approved", status = true, new Date()))
   private val person2Stage3 = converterEvents.write(Event("0012-00157", "Approved", status = true, new Date()))
   private val person3Stage3 = converterEvents.write(Event("0125-00263", "Approved", status = true, new Date()))
@@ -44,6 +46,8 @@ object Producer extends App with ConverterFromToJson {
   producer.send(new ProducerRecord[Int, String](topicName, 4, person1Stage2.toString()))
   producer.send(new ProducerRecord[Int, String](topicName, 5, person2Stage2.toString()))
   producer.send(new ProducerRecord[Int, String](topicName, 6, person3Stage2.toString()))
+
+  producer.send(new ProducerRecord[Int, String](topicName, 0, invalidEvent.toString()))
 
   producer.send(new ProducerRecord[Int, String](topicName, 7, person1Stage3.toString()))
   producer.send(new ProducerRecord[Int, String](topicName, 8, person2Stage3.toString()))

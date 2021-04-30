@@ -5,7 +5,7 @@ import spray.json.{ DeserializationException, JsBoolean, JsObject, JsString, JsV
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-trait ConverterFromToJson {
+trait Converter {
 
   implicit object converterEvents extends RootJsonFormat[Event] {
 
@@ -20,7 +20,10 @@ trait ConverterFromToJson {
       json.asJsObject.getFields("externalClientId", "stage", "status", "date") match {
         case Seq(JsString(clientID), JsString(stage), JsBoolean(status), JsString(data)) =>
           Event(clientID, stage, status, new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH).parse(data))
-        case _ => throw DeserializationException("Event excepted")
+        case ex =>
+          throw DeserializationException(
+            s"ERROR: Deserialization error occurred when trying to deserialize: $ex"
+          )
       }
     }
   }
